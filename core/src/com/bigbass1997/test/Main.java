@@ -4,8 +4,6 @@ import java.util.Random;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -14,8 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.bigbass1997.test.fonts.FontManager;
 import com.bigbass1997.test.world.Cube;
-import com.bigbass1997.test.world.World;
 import com.bigbass1997.test.world.Object;
+import com.bigbass1997.test.world.World;
 
 public class Main extends ApplicationAdapter {
 	
@@ -34,35 +32,39 @@ public class Main extends ApplicationAdapter {
 		cam.position.set(500f, 500f, 500f);
 		cam.lookAt(Vector3.Zero);
 		cam.near = 1f;
-		cam.far = 3000f;
+		cam.far = 5000f;
 		cam.update();
 		
 		world = new World(cam);
-		//world.addObject("CUBE1", new Cube(50, 50, 50, 100, 0xFFFFFFFF));
-		
-		//System.out.println(world.objects.get("CUBE1").getPos());
 		
 		stage = new Stage();
 		
 		debugLabel = new Label("", new Label.LabelStyle(FontManager.getFont("fonts/computer.ttf", 18).font, Color.BLACK));
-		debugLabel.setPosition(10, Gdx.graphics.getHeight() - 45);
+		debugLabel.setPosition(10, Gdx.graphics.getHeight() - 90);
 		
 		stage.addActor(debugLabel);
+		
+		for(int i = 0; i < 1000; i++){
+			world.addObject("OBJECT_" + i, new Cube(
+					3f/2f, 3f/2f, 3f/2f,
+					3, Color.argb8888(0, 1, 0, 1)));
+		}
 	}
-
+	
 	@Override
 	public void render(){
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClearColor(1, 1, 1, 1);
-		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-		Input input = Gdx.input;
 		float speed = 50f * Gdx.graphics.getDeltaTime();
 		
 		Random rand = new Random();
-		world.addObject("OBJECT_" + i, new Cube(
+		/*world.addObject("OBJECT_" + i, new Cube(
 				(rand.nextFloat() * 1000)-500, (rand.nextFloat() * 1000)-500, (rand.nextFloat() * 1000)-500,
-				5, Color.argb8888(0, rand.nextFloat() + 0.5f, 0, 1)));
+				5, Color.argb8888(0, rand.nextFloat() + 0.5f, 0, 1)));*/
+		/*world.addObject("OBJECT_" + i, new Cube(
+				3f/2f, 3f/2f, 3f/2f,
+				3, Color.argb8888(0, 1, 0, 1)));*/
 		i+=1;
 		
 		debugLabel.setText(
@@ -72,16 +74,24 @@ public class Main extends ApplicationAdapter {
 				"Cam Pos:\n" +
 				"  X: " + world.cam.position.x + "\n" +
 				"  Y: " + world.cam.position.y + "\n" +
-				"  Z: " + world.cam.position.z
+				"  Z: " + world.cam.position.z + "\n" +
+				"Cam Dir:\n" +
+				"  X: " + world.cam.direction.x + "\n" +
+				"  Y: " + world.cam.direction.y + "\n" +
+				"  Z: " + world.cam.direction.z + "\n" +
+				"Cam Up:\n" +
+				"  X: " + world.cam.up.x + "\n" +
+				"  Y: " + world.cam.up.y + "\n" +
+				"  Z: " + world.cam.up.z
 		);
 		
 		stage.draw();
-
 		world.render();
 		
-		if(input.isKeyPressed(Keys.NUMPAD_8)) world.rotateCam(0, speed/10);
-		if(input.isKeyPressed(Keys.NUMPAD_2)) world.rotateCam(0, -speed/10);
-		
+		float dist = 10f;
+		for(Object ob : world.objects.values()){
+			ob.addPos((rand.nextFloat() * dist) - (dist/2f), (rand.nextFloat() * dist) - (dist/2f), (rand.nextFloat() * dist) - (dist/2f));
+		}
 		world.update(Gdx.graphics.getDeltaTime());
 	}
 	

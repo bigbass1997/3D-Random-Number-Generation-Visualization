@@ -2,16 +2,16 @@ package com.bigbass1997.test.world;
 
 import java.util.Hashtable;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.bigbass1997.test.graphics.QuickRender;
 
@@ -20,6 +20,7 @@ public class World {
 	public Hashtable<String, Object> objects;
 	
 	public Camera cam;
+	private final Vector3 camtmp = new Vector3();
 	
 	public ImmediateModeRenderer20 rend;
 	public QuickRender quickRend;
@@ -50,26 +51,6 @@ public class World {
 		objects.remove(id);
 	}
 	
-	public void rotateCam(float theta, float phi){
-		theta = (float) Math.toRadians(theta);
-		phi = (float) Math.toRadians(phi);
-		
-		float oldRho = (float) Math.sqrt(Math.pow(cam.position.x, 2) + Math.pow(cam.position.y, 2) + Math.pow(cam.position.z, 2));
-		System.out.println("oldRho: " + oldRho);
-		
-		float x = (float) (oldRho * Math.sin(phi) * Math.cos(theta)); 
-		float y = (float) (oldRho * Math.sin(phi) * Math.sin(theta));
-		float z = (oldRho * phi);
-		System.out.println(x + " | " + y + " | " + z);
-		
-		float newRho = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
-		System.out.println("newRho: " + newRho);
-		
-		cam.position.set(newRho, theta, phi);
-		cam.lookAt(Vector3.Zero);
-		cam.update();
-	}
-	
 	public void render(){
 		quickRend.beginLines();
 		quickRend.line(0, 0, 0, 0xFF0000FF, 500, 0, 0, 0xFF0000FF);
@@ -90,7 +71,51 @@ public class World {
 			object.update(delta);
 		}
 		
-		//cam.rotateAround(Vector3.Zero, Vector3.Y, -10.0f * delta);
+		Input input = Gdx.input;
+		
+		float speed = 50f * Gdx.graphics.getDeltaTime();
+		float mult = 2.0f;
+		
+		if (input.isKeyPressed(Keys.W)) {
+			camtmp.set(cam.direction).nor().scl(speed*mult);
+			cam.position.add(camtmp);
+		}
+		if (input.isKeyPressed(Keys.S)) {
+			camtmp.set(cam.direction).nor().scl(-speed*mult);
+			cam.position.add(camtmp);
+		}
+		if (input.isKeyPressed(Keys.A)) {
+			camtmp.set(cam.direction).crs(cam.up).nor().scl(-speed*mult);
+			cam.position.add(camtmp);
+		}
+		if (input.isKeyPressed(Keys.D)) {
+			camtmp.set(cam.direction).crs(cam.up).nor().scl(speed*mult);
+			cam.position.add(camtmp);
+		}
+		if (input.isKeyPressed(Keys.SPACE)) {
+			camtmp.set(cam.up).nor().scl(speed);
+			cam.position.add(camtmp);
+		}
+		if (input.isKeyPressed(Keys.SHIFT_LEFT)) {
+			camtmp.set(cam.up).nor().scl(-speed);
+			cam.position.add(camtmp);
+		}
+		
+		if(input.isKeyPressed(Keys.Q)){
+			cam.rotate(-speed*mult, cam.direction.x, cam.direction.y, cam.direction.z);
+		}
+		if(input.isKeyPressed(Keys.E)){
+			cam.rotate(speed*mult, cam.direction.x, cam.direction.y, cam.direction.z);
+		}
+		
+		if(input.isButtonPressed(Buttons.LEFT)){
+			float deltaX = -Gdx.input.getDeltaX() * 0.5f;
+			float deltaY = -Gdx.input.getDeltaY() * 0.5f;
+			cam.direction.rotate(cam.up, deltaX);
+			camtmp.set(cam.direction).crs(cam.up).nor();
+			cam.direction.rotate(camtmp, deltaY);
+		}
+		
 		cam.update();
 	}
 	
