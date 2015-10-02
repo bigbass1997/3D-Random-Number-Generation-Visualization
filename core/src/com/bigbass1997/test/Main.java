@@ -23,6 +23,8 @@ public class Main extends ApplicationAdapter {
 	public Label debugLabel;
 	
 	public int i = 0;
+
+	private Vector3 avgVec = Vector3.Zero, sumVec = Vector3.Zero;
 	
 	@Override
 	public void create(){
@@ -40,14 +42,15 @@ public class Main extends ApplicationAdapter {
 		stage = new Stage();
 		
 		debugLabel = new Label("", new Label.LabelStyle(FontManager.getFont("fonts/computer.ttf", 18).font, Color.BLACK));
-		debugLabel.setPosition(10, Gdx.graphics.getHeight() - 90);
+		debugLabel.setPosition(10, Gdx.graphics.getHeight() - 120);
 		
 		stage.addActor(debugLabel);
 		
+		float si = 3;
 		for(int i = 0; i < 1000; i++){
 			world.addObject("OBJECT_" + i, new Cube(
-					3f/2f, 3f/2f, 3f/2f,
-					3, Color.argb8888(0, 1, 0, 1)));
+					si/2f, si/2f, si/2f,
+					si, Color.argb8888(0, 1, 0, 1)));
 		}
 	}
 	
@@ -82,16 +85,28 @@ public class Main extends ApplicationAdapter {
 				"Cam Up:\n" +
 				"  X: " + world.cam.up.x + "\n" +
 				"  Y: " + world.cam.up.y + "\n" +
-				"  Z: " + world.cam.up.z
+				"  Z: " + world.cam.up.z + "\n" +
+				"AvgVec:\n" +
+				"  X: " + avgVec.x + "\n" +
+				"  Y: " + avgVec.y + "\n" +
+				"  Z: " + avgVec.z
 		);
 		
 		stage.draw();
 		world.render();
 		
+		avgVec = new Vector3(0,0,0);
+		sumVec = new Vector3(0,0,0);
+		
 		float dist = 10f;
 		for(Object ob : world.objects.values()){
 			ob.addPos((rand.nextFloat() * dist) - (dist/2f), (rand.nextFloat() * dist) - (dist/2f), (rand.nextFloat() * dist) - (dist/2f));
+			sumVec = sumVec.add(ob.getPos());
 		}
+		avgVec.x = sumVec.x / world.objects.values().size();
+		avgVec.y = sumVec.y / world.objects.values().size();
+		avgVec.z = sumVec.z / world.objects.values().size();
+		
 		world.update(Gdx.graphics.getDeltaTime());
 	}
 	
