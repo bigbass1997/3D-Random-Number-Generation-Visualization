@@ -13,6 +13,8 @@ public class Object {
 	public Model model;
 	public ModelInstance modelInstance;
 	
+	public int color;
+	
 	/**
 	 * <p>Creates new base Object at origin with a size of 0.</p>
 	 */
@@ -81,6 +83,7 @@ public class Object {
 	public Object(Vector3 pos, Vector3 size){
 		this.pos = pos;
 		this.size = size;
+		this.color = 0x000000FF;
 	}
 	
 	public void setPos(Vector3 pos){

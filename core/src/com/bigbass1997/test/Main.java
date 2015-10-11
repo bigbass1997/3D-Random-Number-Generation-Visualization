@@ -24,12 +24,13 @@ public class Main extends ApplicationAdapter {
 	
 	public int i = 0;
 
-	private Vector3 avgVec = Vector3.Zero, sumVec = Vector3.Zero;
+	private Vector3 avgVec = new Vector3(0,0,0), sumVec = new Vector3(0,0,0), tmpVec = new Vector3(0,0,0);
 	
 	@Override
 	public void create(){
-		FontManager.addFont("fonts/computer.ttf");
+		FontManager.addFont("fonts/computer.ttf"); //Added font to be used with Debug Text
 		
+		//create, setup, and pass the camera that will be used. (Perspective or Orthogonal)
 		PerspectiveCamera cam = new PerspectiveCamera(67f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cam.position.set(500f, 500f, 500f);
 		cam.lookAt(Vector3.Zero);
@@ -37,16 +38,21 @@ public class Main extends ApplicationAdapter {
 		cam.far = 5000f;
 		cam.update();
 		
+		//Creates new world that holds all the objects that will be rendered and includes camera controls
 		world = new World(cam);
 		
+		//Creates new stage for use with the debug text label
 		stage = new Stage();
 		
 		debugLabel = new Label("", new Label.LabelStyle(FontManager.getFont("fonts/computer.ttf", 18).font, Color.BLACK));
 		debugLabel.setPosition(10, Gdx.graphics.getHeight() - 120);
 		
+		//Adds the debug label to the stage so that it can be rendered/updated
 		stage.addActor(debugLabel);
 		
-		float si = 3;
+		//Pregenerates i number of objects at exact origin position
+		float si = 4;
+		Random rand = new Random();
 		for(int i = 0; i < 1000; i++){
 			world.addObject("OBJECT_" + i, new Cube(
 					si/2f, si/2f, si/2f,
@@ -59,7 +65,7 @@ public class Main extends ApplicationAdapter {
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-		float speed = 50f * Gdx.graphics.getDeltaTime();
+		float speed = 50f * Gdx.graphics.getDeltaTime(); //allows for equal movement speed no matter the FPS
 		
 		Random rand = new Random();
 		/*world.addObject("OBJECT_" + i, new Cube(
@@ -97,11 +103,23 @@ public class Main extends ApplicationAdapter {
 		
 		avgVec = new Vector3(0,0,0);
 		sumVec = new Vector3(0,0,0);
+		tmpVec = new Vector3(0,0,0);
 		
 		float dist = 10f;
+		float x,y,z;
 		for(Object ob : world.objects.values()){
-			ob.addPos((rand.nextFloat() * dist) - (dist/2f), (rand.nextFloat() * dist) - (dist/2f), (rand.nextFloat() * dist) - (dist/2f));
+			tmpVec = ob.getPos();
+			
+			x = (rand.nextFloat() * dist) - (dist/2f);
+			y = (rand.nextFloat() * dist) - (dist/2f);
+			z = (rand.nextFloat() * dist) - (dist/2f);
+			ob.addPos(x, y, z);
 			sumVec = sumVec.add(ob.getPos());
+			/*
+			System.out.println("--\\/--");
+			System.out.println("X: " + x);
+			System.out.println("Y: " + y);
+			System.out.println("Z: " + z);*/
 		}
 		avgVec.x = sumVec.x / world.objects.values().size();
 		avgVec.y = sumVec.y / world.objects.values().size();

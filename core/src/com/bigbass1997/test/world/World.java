@@ -58,6 +58,7 @@ public class World {
 		quickRend.line(0, 0, 0, 0x0000FFFF, 0, 0, 500, 0x0000FFFF);
 		
 		//Render line from origin to each object
+		//for(Object object : objects.values()) quickRend.line(object.pos, object.color, new Vector3(0,0,0), object.color);
 		for(Object object : objects.values()) quickRend.line(object.pos, 0x000000FF, new Vector3(0,0,0), 0x000000FF);
 		
 		quickRend.endLines();

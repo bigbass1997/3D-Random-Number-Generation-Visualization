@@ -17,6 +17,7 @@ public class Cube extends Object {
 	public Cube(float x, float y, float z, float size, int color){
 		this.pos = new Vector3(x, y, z);
 		this.size = new Vector3(size, size, size);
+		this.color = color;
 		
 		ModelBuilder modelBuilder = new ModelBuilder();
 		model = modelBuilder.createBox(size, size, size, 
