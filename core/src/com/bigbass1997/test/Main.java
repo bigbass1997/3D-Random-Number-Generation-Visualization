@@ -1,9 +1,11 @@
 package com.bigbass1997.test;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -23,8 +25,9 @@ public class Main extends ApplicationAdapter {
 	public Label debugLabel;
 	
 	public int i = 0;
-
-	private Vector3 avgVec = new Vector3(0,0,0), sumVec = new Vector3(0,0,0), tmpVec = new Vector3(0,0,0);
+	
+	public ArrayList<Vector3> allChangeVecs = new ArrayList<Vector3>();
+	public Vector3 avgVec = new Vector3(0,0,0);
 	
 	@Override
 	public void create(){
@@ -53,7 +56,7 @@ public class Main extends ApplicationAdapter {
 		//Pregenerates i number of objects at exact origin position
 		float si = 4;
 		Random rand = new Random();
-		for(int i = 0; i < 1000; i++){
+		for(int i = 0; i < 2500; i++){
 			world.addObject("OBJECT_" + i, new Cube(
 					si/2f, si/2f, si/2f,
 					si, Color.argb8888(0, 1, 0, 1)));
@@ -95,37 +98,51 @@ public class Main extends ApplicationAdapter {
 				"AvgVec:\n" +
 				"  X: " + avgVec.x + "\n" +
 				"  Y: " + avgVec.y + "\n" +
-				"  Z: " + avgVec.z
+				"  Z: " + avgVec.z + "\n" +
+				"  S: " + allChangeVecs.size()
 		);
 		
 		stage.draw();
 		world.render();
-		
-		avgVec = new Vector3(0,0,0);
-		sumVec = new Vector3(0,0,0);
-		tmpVec = new Vector3(0,0,0);
+		allChangeVecs.clear();
 		
 		float dist = 10f;
 		float x,y,z;
 		for(Object ob : world.objects.values()){
-			tmpVec = ob.getPos();
-			
 			x = (rand.nextFloat() * dist) - (dist/2f);
 			y = (rand.nextFloat() * dist) - (dist/2f);
 			z = (rand.nextFloat() * dist) - (dist/2f);
 			ob.addPos(x, y, z);
-			sumVec = sumVec.add(ob.getPos());
+			allChangeVecs.add(new Vector3(x, y, z));
 			/*
 			System.out.println("--\\/--");
 			System.out.println("X: " + x);
 			System.out.println("Y: " + y);
 			System.out.println("Z: " + z);*/
 		}
-		avgVec.x = sumVec.x / world.objects.values().size();
-		avgVec.y = sumVec.y / world.objects.values().size();
-		avgVec.z = sumVec.z / world.objects.values().size();
 		
 		world.update(Gdx.graphics.getDeltaTime());
+		
+		
+		
+		if(Gdx.input.isKeyPressed(Keys.Z) || true){
+			Vector3 avg = new Vector3(0,0,0);
+			
+			for(Vector3 vec : allChangeVecs){
+				avg.x += vec.x;
+				avg.y += vec.y;
+				avg.z += vec.z;
+			}
+			avg.x /= allChangeVecs.size();
+			avg.y /= allChangeVecs.size();
+			avg.z /= allChangeVecs.size();
+			
+			avg.x = Math.abs(avg.x);
+			avg.y = Math.abs(avg.y);
+			avg.z = Math.abs(avg.z);
+			
+			avgVec = avg;
+		}
 	}
 	
 	@Override

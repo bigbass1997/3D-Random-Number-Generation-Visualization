@@ -33,7 +33,7 @@ public class World {
 		
 		this.cam = cam;
 
-		rend = new ImmediateModeRenderer20(false, true, 0);
+		rend = new ImmediateModeRenderer20(50000, false, true, 0);
 		quickRend = new QuickRender(cam, rend);
 		
 		modelBatch = new ModelBatch();
@@ -59,7 +59,7 @@ public class World {
 		
 		//Render line from origin to each object
 		//for(Object object : objects.values()) quickRend.line(object.pos, object.color, new Vector3(0,0,0), object.color);
-		for(Object object : objects.values()) quickRend.line(object.pos, 0x000000FF, new Vector3(0,0,0), 0x000000FF);
+		for(Object object : objects.values()) quickRend.line(object.pos, 0x00FF00FF, new Vector3(0,0,0), 0x000000FF);
 		
 		quickRend.endLines();
 		
